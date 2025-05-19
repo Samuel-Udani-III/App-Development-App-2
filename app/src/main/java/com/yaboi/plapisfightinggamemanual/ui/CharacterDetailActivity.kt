@@ -23,7 +23,7 @@ class CharacterDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_detail)
 
-        val characterId = intent.getStringExtra(EXTRA_CHARACTER_ID)
+        var characterId = intent.getStringExtra(EXTRA_CHARACTER_ID)
         gameId = intent.getStringExtra(EXTRA_GAME_ID) ?: "ggst"
         val moveToHighlight = intent.getStringExtra(EXTRA_MOVE_TO_HIGHLIGHT)
 
@@ -31,6 +31,9 @@ class CharacterDetailActivity : AppCompatActivity() {
             finish()
             return
         }
+
+        // Strip game prefix from character ID if it exists
+        characterId = characterId.substringAfter("${gameId}_")
 
         characterDetails = try {
             when (gameId) {

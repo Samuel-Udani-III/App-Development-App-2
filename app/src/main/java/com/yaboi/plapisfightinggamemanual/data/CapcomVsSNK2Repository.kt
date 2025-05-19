@@ -5,6 +5,10 @@ object CapcomVsSNK2Repository {
         return characterData[characterId]
     }
 
+    fun getAllCharacters(): List<CharacterDetails> {
+        return characterData.values.toList()
+    }
+
     private val characterData = mapOf(
         "ryu" to CharacterDetails(
             id = "ryu",

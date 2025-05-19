@@ -2,13 +2,16 @@ package com.yaboi.plapisfightinggamemanual
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.yaboi.plapisfightinggamemanual.ui.FavoritesFragment
 import com.yaboi.plapisfightinggamemanual.ui.SearchFragment
@@ -16,7 +19,7 @@ import com.yaboi.plapisfightinggamemanual.ui.SearchFragment
 class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var bottomNavigation: BottomNavigationView
-    private lateinit var titleTextView: TextView
+    private lateinit var topAppBar: MaterialToolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +27,9 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.gamesRecyclerView)
         bottomNavigation = findViewById(R.id.bottomNavigation)
-        titleTextView = findViewById(R.id.titleTextView)
+        topAppBar = findViewById(R.id.topAppBar)
+
+        setSupportActionBar(topAppBar)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         setupGames()
@@ -35,6 +40,42 @@ class MainActivity : AppCompatActivity() {
             showFavoritesFragment()
             bottomNavigation.selectedItemId = R.id.navigation_favorites
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.top_app_bar, menu)
+        updateThemeIcon(menu.findItem(R.id.action_toggle_theme))
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_toggle_theme -> {
+                toggleDarkMode()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun toggleDarkMode() {
+        when (AppCompatDelegate.getDefaultNightMode()) {
+            AppCompatDelegate.MODE_NIGHT_YES -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+            else -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+        }
+    }
+
+    private fun updateThemeIcon(menuItem: MenuItem) {
+        menuItem.setIcon(
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
+                R.drawable.ic_light_mode
+            else
+                R.drawable.ic_dark_mode
+        )
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -113,7 +154,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showGamesView() {
         recyclerView.visibility = View.VISIBLE
-        titleTextView.visibility = View.VISIBLE
         supportFragmentManager.findFragmentById(R.id.fragmentContainer)?.let {
             supportFragmentManager.beginTransaction()
                 .remove(it)
@@ -123,7 +163,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showFavoritesFragment() {
         recyclerView.visibility = View.GONE
-        titleTextView.visibility = View.GONE
         val fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
         if (fragment !is FavoritesFragment) {
             supportFragmentManager.beginTransaction()
@@ -134,7 +173,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showSearchFragment() {
         recyclerView.visibility = View.GONE
-        titleTextView.visibility = View.GONE
         val fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
         if (fragment !is SearchFragment) {
             supportFragmentManager.beginTransaction()

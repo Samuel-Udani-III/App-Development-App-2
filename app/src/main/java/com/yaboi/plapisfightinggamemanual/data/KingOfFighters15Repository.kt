@@ -5,6 +5,10 @@ object KingOfFighters15Repository {
         return characterData[characterId]
     }
 
+    fun getAllCharacters(): List<CharacterDetails> {
+        return characterData.values.toList()
+    }
+
     private val characterData = mapOf(
         "kyo" to CharacterDetails(
             id = "kyo",

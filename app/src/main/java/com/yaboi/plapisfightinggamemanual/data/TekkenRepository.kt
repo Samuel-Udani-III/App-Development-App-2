@@ -5,6 +5,10 @@ object TekkenRepository {
         return characterData[characterId]
     }
 
+    fun getAllCharacters(): List<CharacterDetails> {
+        return characterData.values.toList()
+    }
+
     private val characterData = mapOf(
         "kazuya" to CharacterDetails(
             id = "kazuya",

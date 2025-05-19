@@ -5,6 +5,10 @@ object SamuraiShodownRepository {
         return characterData[characterId]
     }
 
+    fun getAllCharacters(): List<CharacterDetails> {
+        return characterData.values.toList()
+    }
+
     private val characterData = mapOf(
         "haohmaru" to CharacterDetails(
             id = "haohmaru",

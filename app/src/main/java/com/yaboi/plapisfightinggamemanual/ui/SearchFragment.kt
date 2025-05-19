@@ -137,13 +137,14 @@ class SearchFragment : Fragment() {
     }
     
     private fun determineGameId(characterId: String): String {
-        // This is a simple implementation - you might want to make this more robust
+        // Match the game IDs used in MainActivity and CharacterDetailActivity
         return when {
-            characterId in listOf("scorpion", "sub-zero", "raiden") -> "mk"
-            characterId in listOf("haohmaru", "nakoruru", "jubei") -> "ss"
-            characterId in listOf("sol", "ky", "may") -> "ggs"
-            characterId in listOf("ryu", "ken", "chun-li") -> "cvs2"
-            else -> "unknown"
+            characterId.startsWith("ggst_") -> "ggst"
+            characterId.startsWith("kof15_") -> "kof15"
+            characterId.startsWith("samsho_") -> "samsho"
+            characterId.startsWith("cvs2_") -> "cvs2"
+            characterId.startsWith("tekken7_") -> "tekken7"
+            else -> "ggst" // Default to Guilty Gear Strive
         }
     }
     

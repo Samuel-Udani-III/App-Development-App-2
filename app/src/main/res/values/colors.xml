@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Light Theme Colors -->
     <color name="primary">#2196F3</color>
     <color name="primary_dark">#1976D2</color>
     <color name="primary_light">#BBDEFB</color>
@@ -10,6 +11,18 @@
     <color name="divider">#BDBDBD</color>
     <color name="background">#FAFAFA</color>
     <color name="card_background">#FFFFFF</color>
+    
+    <!-- Dark Theme Colors -->
+    <color name="primary_dark_theme">#90CAF9</color>
+    <color name="primary_dark_dark_theme">#64B5F6</color>
+    <color name="accent_dark_theme">#FF80AB</color>
+    <color name="primary_text_dark">#FFFFFF</color>
+    <color name="secondary_text_dark">#B3FFFFFF</color>
+    <color name="divider_dark">#1FFFFFFF</color>
+    <color name="background_dark">#121212</color>
+    <color name="card_background_dark">#1E1E1E</color>
+
+    <!-- Other Colors -->
     <color name="damage_text">#F44336</color>
     <color name="frame_data_text">#757575</color>
     <color name="move_input_text">#2196F3</color>

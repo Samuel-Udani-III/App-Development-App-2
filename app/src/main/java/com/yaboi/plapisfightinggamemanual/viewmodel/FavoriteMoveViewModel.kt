@@ -34,7 +34,7 @@ class FavoriteMoveViewModel(application: Application) : AndroidViewModel(applica
 
     fun addToFavorites(move: FavoriteMove) {
         viewModelScope.launch {
-            repository.insertFavorite(move)
+        repository.insertFavorite(move)
             updateFavoriteState(move.moveId, true)
         }
     }
@@ -48,7 +48,7 @@ class FavoriteMoveViewModel(application: Application) : AndroidViewModel(applica
 
     fun removeFromFavorites(move: FavoriteMove) {
         viewModelScope.launch {
-            repository.deleteFavorite(move)
+        repository.deleteFavorite(move)
             updateFavoriteState(move.moveId, false)
         }
     }

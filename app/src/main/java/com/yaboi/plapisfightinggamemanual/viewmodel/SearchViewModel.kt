@@ -61,93 +61,245 @@ class SearchViewModel : ViewModel() {
     }
 
     private fun searchCharacters(searchTerm: String, results: MutableList<SearchResult>) {
-        val repositories = listOf(
-            MortalKombatRepository,
-            SamuraiShodownRepository,
-            GuiltyGearStriveRepository,
-            CapcomVsSNK2Repository
-        )
-
-        repositories.forEach { repository ->
-            repository::class.java.getDeclaredField("characterData").apply {
-                isAccessible = true
-                @Suppress("UNCHECKED_CAST")
-                val characters = (get(repository) as Map<String, CharacterDetails>)
-                characters.values.filter { character ->
-                    character.name.lowercase().contains(searchTerm)
-                }.forEach { character ->
+        try {
+            // Search in Guilty Gear Strive
+            GuiltyGearStriveRepository.getAllCharacters().forEach { character ->
+                if (character.name.lowercase().contains(searchTerm)) {
                     results.add(
                         SearchResult.CharacterResult(
-                            characterId = character.id,
+                            characterId = "ggst_${character.id}",
                             name = character.name,
                             playstyle = character.playstyle
                         )
                     )
                 }
             }
+
+            // Search in King of Fighters XV
+            KingOfFighters15Repository.getAllCharacters().forEach { character ->
+                if (character.name.lowercase().contains(searchTerm)) {
+                    results.add(
+                        SearchResult.CharacterResult(
+                            characterId = "kof15_${character.id}",
+                            name = character.name,
+                            playstyle = character.playstyle
+                        )
+                    )
+                }
+            }
+
+            // Search in Samurai Shodown
+            SamuraiShodownRepository.getAllCharacters().forEach { character ->
+                if (character.name.lowercase().contains(searchTerm)) {
+                    results.add(
+                        SearchResult.CharacterResult(
+                            characterId = "samsho_${character.id}",
+                            name = character.name,
+                            playstyle = character.playstyle
+                        )
+                    )
+                }
+            }
+
+            // Search in Capcom vs SNK 2
+            CapcomVsSNK2Repository.getAllCharacters().forEach { character ->
+                if (character.name.lowercase().contains(searchTerm)) {
+                    results.add(
+                        SearchResult.CharacterResult(
+                            characterId = "cvs2_${character.id}",
+                            name = character.name,
+                            playstyle = character.playstyle
+                        )
+                    )
+                }
+            }
+
+            // Search in Tekken 7
+            TekkenRepository.getAllCharacters().forEach { character ->
+                if (character.name.lowercase().contains(searchTerm)) {
+                    results.add(
+                        SearchResult.CharacterResult(
+                            characterId = "tekken7_${character.id}",
+                            name = character.name,
+                            playstyle = character.playstyle
+                        )
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     private fun searchArchetypes(searchTerm: String, results: MutableList<SearchResult>) {
-        val repositories = listOf(
-            MortalKombatRepository,
-            SamuraiShodownRepository,
-            GuiltyGearStriveRepository,
-            CapcomVsSNK2Repository
-        )
-
-        repositories.forEach { repository ->
-            repository::class.java.getDeclaredField("characterData").apply {
-                isAccessible = true
-                @Suppress("UNCHECKED_CAST")
-                val characters = (get(repository) as Map<String, CharacterDetails>)
-                characters.values.filter { character ->
-                    character.playstyle.lowercase().contains(searchTerm)
-                }.forEach { character ->
+        try {
+            // Search in Guilty Gear Strive
+            GuiltyGearStriveRepository.getAllCharacters().forEach { character ->
+                if (character.playstyle.lowercase().contains(searchTerm)) {
                     results.add(
                         SearchResult.CharacterResult(
-                            characterId = character.id,
+                            characterId = "ggst_${character.id}",
                             name = character.name,
                             playstyle = character.playstyle
                         )
                     )
                 }
             }
+
+            // Search in King of Fighters XV
+            KingOfFighters15Repository.getAllCharacters().forEach { character ->
+                if (character.playstyle.lowercase().contains(searchTerm)) {
+                    results.add(
+                        SearchResult.CharacterResult(
+                            characterId = "kof15_${character.id}",
+                            name = character.name,
+                            playstyle = character.playstyle
+                        )
+                    )
+                }
+            }
+
+            // Search in Samurai Shodown
+            SamuraiShodownRepository.getAllCharacters().forEach { character ->
+                if (character.playstyle.lowercase().contains(searchTerm)) {
+                    results.add(
+                        SearchResult.CharacterResult(
+                            characterId = "samsho_${character.id}",
+                            name = character.name,
+                            playstyle = character.playstyle
+                        )
+                    )
+                }
+            }
+
+            // Search in Capcom vs SNK 2
+            CapcomVsSNK2Repository.getAllCharacters().forEach { character ->
+                if (character.playstyle.lowercase().contains(searchTerm)) {
+                    results.add(
+                        SearchResult.CharacterResult(
+                            characterId = "cvs2_${character.id}",
+                            name = character.name,
+                            playstyle = character.playstyle
+                        )
+                    )
+                }
+            }
+
+            // Search in Tekken 7
+            TekkenRepository.getAllCharacters().forEach { character ->
+                if (character.playstyle.lowercase().contains(searchTerm)) {
+                    results.add(
+                        SearchResult.CharacterResult(
+                            characterId = "tekken7_${character.id}",
+                            name = character.name,
+                            playstyle = character.playstyle
+                        )
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     private fun searchMoves(searchTerm: String, results: MutableList<SearchResult>) {
-        val repositories = listOf(
-            MortalKombatRepository,
-            SamuraiShodownRepository,
-            GuiltyGearStriveRepository,
-            CapcomVsSNK2Repository
-        )
-
-        repositories.forEach { repository ->
-            repository::class.java.getDeclaredField("characterData").apply {
-                isAccessible = true
-                @Suppress("UNCHECKED_CAST")
-                val characters = (get(repository) as Map<String, CharacterDetails>)
-                characters.forEach { (characterId, character) ->
-                    character.moves.forEach { (moveType, moveList) ->
-                        moveList.filter { move ->
-                            move.name.lowercase().contains(searchTerm) ||
-                            move.input.lowercase().contains(searchTerm) ||
-                            move.description.lowercase().contains(searchTerm) ||
-                            move.properties.any { it.name.lowercase().contains(searchTerm) }
-                        }.forEach { move ->
-                            results.add(
-                                SearchResult.MoveResult(
-                                    characterId = characterId,
-                                    characterName = character.name,
-                                    move = move
-                                )
+        try {
+            // Search in Guilty Gear Strive
+            GuiltyGearStriveRepository.getAllCharacters().forEach { character ->
+                character.moves.forEach { (_, moveList) ->
+                    moveList.filter { move ->
+                        move.name.lowercase().contains(searchTerm) ||
+                        move.input.lowercase().contains(searchTerm) ||
+                        move.description.lowercase().contains(searchTerm)
+                    }.forEach { move ->
+                        results.add(
+                            SearchResult.MoveResult(
+                                characterId = "ggst_${character.id}",
+                                characterName = character.name,
+                                move = move
                             )
-                        }
+                        )
                     }
                 }
             }
+
+            // Search in King of Fighters XV
+            KingOfFighters15Repository.getAllCharacters().forEach { character ->
+                character.moves.forEach { (_, moveList) ->
+                    moveList.filter { move ->
+                        move.name.lowercase().contains(searchTerm) ||
+                        move.input.lowercase().contains(searchTerm) ||
+                        move.description.lowercase().contains(searchTerm)
+                    }.forEach { move ->
+                        results.add(
+                            SearchResult.MoveResult(
+                                characterId = "kof15_${character.id}",
+                                characterName = character.name,
+                                move = move
+                            )
+                        )
+                    }
+                }
+            }
+
+            // Search in Samurai Shodown
+            SamuraiShodownRepository.getAllCharacters().forEach { character ->
+                character.moves.forEach { (_, moveList) ->
+                    moveList.filter { move ->
+                        move.name.lowercase().contains(searchTerm) ||
+                        move.input.lowercase().contains(searchTerm) ||
+                        move.description.lowercase().contains(searchTerm)
+                    }.forEach { move ->
+                        results.add(
+                            SearchResult.MoveResult(
+                                characterId = "samsho_${character.id}",
+                                characterName = character.name,
+                                move = move
+                            )
+                        )
+                    }
+                }
+            }
+
+            // Search in Capcom vs SNK 2
+            CapcomVsSNK2Repository.getAllCharacters().forEach { character ->
+                character.moves.forEach { (_, moveList) ->
+                    moveList.filter { move ->
+                        move.name.lowercase().contains(searchTerm) ||
+                        move.input.lowercase().contains(searchTerm) ||
+                        move.description.lowercase().contains(searchTerm)
+                    }.forEach { move ->
+                        results.add(
+                            SearchResult.MoveResult(
+                                characterId = "cvs2_${character.id}",
+                                characterName = character.name,
+                                move = move
+                            )
+                        )
+                    }
+                }
+            }
+
+            // Search in Tekken 7
+            TekkenRepository.getAllCharacters().forEach { character ->
+                character.moves.forEach { (_, moveList) ->
+                    moveList.filter { move ->
+                        move.name.lowercase().contains(searchTerm) ||
+                        move.input.lowercase().contains(searchTerm) ||
+                        move.description.lowercase().contains(searchTerm)
+                    }.forEach { move ->
+                        results.add(
+                            SearchResult.MoveResult(
+                                characterId = "tekken7_${character.id}",
+                                characterName = character.name,
+                                move = move
+                            )
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 } 
