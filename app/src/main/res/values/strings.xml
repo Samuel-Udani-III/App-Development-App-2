@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fighting Game Guide</string>
+    
+    <!-- Game Titles -->
+    <string name="guilty_gear_xrd">Guilty Gear Xrd</string>
+    <string name="street_fighter_5">Street Fighter V</string>
+    <string name="tekken_7">Tekken 7</string>
+    <string name="blazblue_cf">BlazBlue Central Fiction</string>
+    <string name="capcom_vs_snk">Capcom vs SNK</string>
+    <string name="kof_15">The King of Fighters XV</string>
+
+    <!-- Archetypes -->
+    <string name="archetype_rushdown">Rushdown</string>
+    <string name="archetype_grappler">Grappler</string>
+    <string name="archetype_zoner">Zoner</string>
+    <string name="archetype_balanced">Balanced</string>
+    <string name="archetype_technical">Technical</string>
+    <string name="archetype_defensive">Defensive</string>
+
+    <!-- UI Labels -->
+    <string name="character_overview">Character Overview</string>
+    <string name="moveset">Moveset</string>
+    <string name="damage">Damage: %1$s</string>
+    <string name="frame_data">Frame Data: %1$s</string>
+    <string name="move_input">Input: %1$s</string>
+    <string name="splash_image">Splash Screen Image</string>
+</resources> 
