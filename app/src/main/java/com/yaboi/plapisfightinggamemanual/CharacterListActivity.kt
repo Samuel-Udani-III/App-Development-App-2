@@ -506,7 +506,12 @@ class CharacterListActivity : AppCompatActivity(), CharacterAdapter.OnCharacterC
                     true
                 }
                 R.id.navigation_search -> {
-                    Toast.makeText(this, "Search - Coming Soon", Toast.LENGTH_SHORT).show()
+                    // Navigate to MainActivity's search section
+                    val intent = Intent(this, MainActivity::class.java).apply {
+                        action = "SHOW_SEARCH"  // Set action before starting activity
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    }
+                    startActivity(intent)
                     true
                 }
                 else -> false

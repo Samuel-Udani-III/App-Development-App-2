@@ -2,6 +2,7 @@ package com.yaboi.plapisfightinggamemanual
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -13,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.yaboi.plapisfightinggamemanual.data.PreferencesManager
 import com.yaboi.plapisfightinggamemanual.ui.FavoritesFragment
 import com.yaboi.plapisfightinggamemanual.ui.SearchFragment
 
@@ -20,9 +23,21 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var bottomNavigation: BottomNavigationView
     private lateinit var topAppBar: MaterialToolbar
+    private lateinit var preferencesManager: PreferencesManager
+    private var welcomeDialog: androidx.appcompat.app.AlertDialog? = null
+    private var isThemeChanging = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        preferencesManager = FightingGameManualApp.getInstance().preferencesManager
+        
+        // Apply theme before setting content view
+        delegate.localNightMode = if (preferencesManager.isDarkMode) {
+            AppCompatDelegate.MODE_NIGHT_YES
+        } else {
+            AppCompatDelegate.MODE_NIGHT_NO
+        }
+        
         setContentView(R.layout.activity_main)
 
         recyclerView = findViewById(R.id.gamesRecyclerView)
@@ -39,6 +54,70 @@ class MainActivity : AppCompatActivity() {
         if (intent.getBooleanExtra("SHOW_FAVORITES", false)) {
             showFavoritesFragment()
             bottomNavigation.selectedItemId = R.id.navigation_favorites
+        }
+
+        // Handle show search intent
+        if (intent.action == "SHOW_SEARCH") {
+            showSearchFragment()
+            bottomNavigation.selectedItemId = R.id.navigation_search
+        }
+
+        // Show welcome dialog if this is a fresh start (not a recreation)
+        if (savedInstanceState == null) {
+            showWelcomeDialog()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        welcomeDialog?.dismiss()
+        welcomeDialog = null
+    }
+
+    private fun showWelcomeDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_welcome, null)
+        
+        // Create dialog with explicit handling
+        val dialog = MaterialAlertDialogBuilder(this, com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
+            .setView(dialogView)
+            .setCancelable(false)
+            .setOnDismissListener { 
+                android.util.Log.d("MainActivity", "Dialog dismissed")
+                welcomeDialog = null 
+            }
+            .setOnCancelListener {
+                android.util.Log.d("MainActivity", "Dialog cancelled")
+            }
+            .create()
+
+        // Prevent any automatic dismissal
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setOnShowListener {
+            android.util.Log.d("MainActivity", "Dialog shown")
+            // Ensure dialog can't be dismissed by back button or outside touches
+            dialog.setCancelable(false)
+            dialog.setCanceledOnTouchOutside(false)
+        }
+
+        // Handle the Get Started button click
+        dialogView.findViewById<View>(R.id.btnGetStarted).setOnClickListener {
+            android.util.Log.d("MainActivity", "Get Started clicked")
+            dialog.dismiss()
+            welcomeDialog = null
+        }
+
+        // Show dialog and store reference
+        welcomeDialog = dialog
+        android.util.Log.d("MainActivity", "Showing welcome dialog")
+        dialog.show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Re-show dialog if needed, but not during theme changes
+        if (welcomeDialog?.isShowing != true && !isThemeChanging) {
+            android.util.Log.d("MainActivity", "Re-showing welcome dialog in onResume")
+            showWelcomeDialog()
         }
     }
 
@@ -59,14 +138,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toggleDarkMode() {
-        when (AppCompatDelegate.getDefaultNightMode()) {
-            AppCompatDelegate.MODE_NIGHT_YES -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-            else -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            }
+        // Dismiss any existing dialog before theme change
+        welcomeDialog?.dismiss()
+        welcomeDialog = null
+
+        // Change the theme
+        preferencesManager.isDarkMode = !preferencesManager.isDarkMode
+        
+        // Apply the theme change without recreating the activity
+        delegate.localNightMode = if (preferencesManager.isDarkMode) {
+            AppCompatDelegate.MODE_NIGHT_YES
+        } else {
+            AppCompatDelegate.MODE_NIGHT_NO
         }
+        
+        // Update the theme icon
+        updateThemeIcon(topAppBar.menu.findItem(R.id.action_toggle_theme))
     }
 
     private fun updateThemeIcon(menuItem: MenuItem) {
@@ -87,6 +174,12 @@ class MainActivity : AppCompatActivity() {
             showFavoritesFragment()
             bottomNavigation.selectedItemId = R.id.navigation_favorites
         }
+
+        // Handle show search intent in onNewIntent as well
+        if (intent.action == "SHOW_SEARCH") {
+            showSearchFragment()
+            bottomNavigation.selectedItemId = R.id.navigation_search
+        }
     }
 
     private fun setupGames() {
@@ -98,13 +191,7 @@ class MainActivity : AppCompatActivity() {
                 R.drawable.img_guilty_gear_strive,
                 R.drawable.banner_guilty_gear_strive
             ),
-            Game(
-                "kof15",
-                "The King of Fighters XV",
-                "The newest installment in SNK's flagship fighting game series, featuring 3v3 team battles.",
-                R.drawable.img_kof_fifteen,
-                R.drawable.img_kof_fifteen
-            ),
+                        Game(                "kof15",                "The King of Fighters XV",                "The newest installment in SNK's flagship fighting game series, featuring 3v3 team battles.",                R.drawable.img_kof_fifteen,                R.drawable.banner_kof_fifteen            ),
             Game(
                 "samsho",
                 "Samurai Shodown",
@@ -180,4 +267,6 @@ class MainActivity : AppCompatActivity() {
                 .commit()
         }
     }
+
+    private val handler = Handler(android.os.Looper.getMainLooper())
 } 

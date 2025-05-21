@@ -15,8 +15,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.yaboi.plapisfightinggamemanual.FightingGameManualApp
 import com.yaboi.plapisfightinggamemanual.R
 import com.yaboi.plapisfightinggamemanual.adapters.SearchAdapter
+import com.yaboi.plapisfightinggamemanual.adapters.SearchHistoryAdapter
 import com.yaboi.plapisfightinggamemanual.data.SearchFilter
 import com.yaboi.plapisfightinggamemanual.data.SearchResult
 import com.yaboi.plapisfightinggamemanual.ui.CharacterDetailActivity
@@ -29,8 +31,11 @@ class SearchFragment : Fragment() {
     private lateinit var searchView: SearchView
     private lateinit var filterChipGroup: ChipGroup
     private lateinit var resultsRecyclerView: RecyclerView
+    private lateinit var historyRecyclerView: RecyclerView
     private lateinit var loadingIndicator: CircularProgressIndicator
     private lateinit var searchAdapter: SearchAdapter
+    private lateinit var historyAdapter: SearchHistoryAdapter
+    private val preferencesManager by lazy { FightingGameManualApp.getInstance().preferencesManager }
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,26 +51,56 @@ class SearchFragment : Fragment() {
         searchView = view.findViewById(R.id.searchView)
         filterChipGroup = view.findViewById(R.id.filterChipGroup)
         resultsRecyclerView = view.findViewById(R.id.searchResultsRecyclerView)
+        historyRecyclerView = view.findViewById(R.id.searchHistoryRecyclerView)
         loadingIndicator = view.findViewById(R.id.loadingIndicator)
         
         setupSearchView()
         setupFilterChips()
         setupRecyclerView()
+        setupHistoryRecyclerView()
         observeViewModel()
     }
     
     private fun setupSearchView() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                viewModel.search(query)
+                query?.let { 
+                    preferencesManager.addSearchQuery(it)
+                    viewModel.search(it)
+                }
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 viewModel.search(newText)
+                updateHistoryVisibility(newText)
                 return true
             }
         })
+
+        searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            updateHistoryVisibility(searchView.query?.toString())
+        }
+    }
+
+    private fun updateHistoryVisibility(query: String?) {
+        val showHistory = searchView.hasFocus() && (query.isNullOrEmpty() || query.length < 2)
+        historyRecyclerView.isVisible = showHistory
+        resultsRecyclerView.isVisible = !showHistory
+        if (showHistory) {
+            historyAdapter.submitList(preferencesManager.getSearchHistory())
+        }
+    }
+
+    private fun setupHistoryRecyclerView() {
+        historyAdapter = SearchHistoryAdapter { query ->
+            searchView.setQuery(query, true)
+        }
+        
+        historyRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = historyAdapter
+        }
     }
     
     private fun setupFilterChips() {

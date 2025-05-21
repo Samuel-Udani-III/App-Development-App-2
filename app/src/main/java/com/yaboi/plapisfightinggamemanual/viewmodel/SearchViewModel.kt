@@ -226,21 +226,21 @@ class SearchViewModel : ViewModel() {
             // Search in King of Fighters XV
             KingOfFighters15Repository.getAllCharacters().forEach { character ->
                 character.moves.forEach { (_, moveList) ->
-                    moveList.filter { move ->
-                        move.name.lowercase().contains(searchTerm) ||
-                        move.input.lowercase().contains(searchTerm) ||
+                        moveList.filter { move ->
+                            move.name.lowercase().contains(searchTerm) ||
+                            move.input.lowercase().contains(searchTerm) ||
                         move.description.lowercase().contains(searchTerm)
-                    }.forEach { move ->
-                        results.add(
-                            SearchResult.MoveResult(
+                        }.forEach { move ->
+                            results.add(
+                                SearchResult.MoveResult(
                                 characterId = "kof15_${character.id}",
-                                characterName = character.name,
-                                move = move
+                                    characterName = character.name,
+                                    move = move
+                                )
                             )
-                        )
+                        }
                     }
                 }
-            }
 
             // Search in Samurai Shodown
             SamuraiShodownRepository.getAllCharacters().forEach { character ->
