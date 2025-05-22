@@ -1,15 +1,12 @@
 package com.yaboi.plapisfightinggamemanual
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -30,14 +27,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         preferencesManager = FightingGameManualApp.getInstance().preferencesManager
-        
+
         // Apply theme before setting content view
         delegate.localNightMode = if (preferencesManager.isDarkMode) {
             AppCompatDelegate.MODE_NIGHT_YES
         } else {
             AppCompatDelegate.MODE_NIGHT_NO
         }
-        
+
         setContentView(R.layout.activity_main)
 
         recyclerView = findViewById(R.id.gamesRecyclerView)
@@ -50,19 +47,16 @@ class MainActivity : AppCompatActivity() {
         setupGames()
         setupBottomNavigation()
 
-        // Handle show favorites intent
         if (intent.getBooleanExtra("SHOW_FAVORITES", false)) {
             showFavoritesFragment()
             bottomNavigation.selectedItemId = R.id.navigation_favorites
         }
 
-        // Handle show search intent
         if (intent.action == "SHOW_SEARCH") {
             showSearchFragment()
             bottomNavigation.selectedItemId = R.id.navigation_search
         }
 
-        // Show welcome dialog if this is a fresh start (not a recreation)
         if (savedInstanceState == null) {
             showWelcomeDialog()
         }
@@ -75,62 +69,60 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showWelcomeDialog() {
+        // Inflate the welcome dialog layout
         val dialogView = layoutInflater.inflate(R.layout.dialog_welcome, null)
-        
-        // Create dialog with explicit handling
+
+        // Create the dialog with the custom layout
         val dialog = MaterialAlertDialogBuilder(this, com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
             .setView(dialogView)
             .setCancelable(false)
-            .setOnDismissListener { 
-                android.util.Log.d("MainActivity", "Dialog dismissed")
-                welcomeDialog = null 
-            }
-            .setOnCancelListener {
-                android.util.Log.d("MainActivity", "Dialog cancelled")
+            .setOnDismissListener {
+                welcomeDialog = null
             }
             .create()
 
-        // Prevent any automatic dismissal
+        // Set properties to prevent touch outside and other cancellations
         dialog.setCanceledOnTouchOutside(false)
         dialog.setOnShowListener {
-            android.util.Log.d("MainActivity", "Dialog shown")
-            // Ensure dialog can't be dismissed by back button or outside touches
             dialog.setCancelable(false)
             dialog.setCanceledOnTouchOutside(false)
         }
 
-        // Handle the Get Started button click
+        // Setup button action in dialog
         dialogView.findViewById<View>(R.id.btnGetStarted).setOnClickListener {
-            android.util.Log.d("MainActivity", "Get Started clicked")
-            dialog.dismiss()
+            dialog.dismiss() // Close dialog
             welcomeDialog = null
         }
 
-        // Show dialog and store reference
+        // Show the dialog
         welcomeDialog = dialog
-        android.util.Log.d("MainActivity", "Showing welcome dialog")
         dialog.show()
     }
 
     override fun onResume() {
         super.onResume()
-        // Re-show dialog if needed, but not during theme changes
         if (welcomeDialog?.isShowing != true && !isThemeChanging) {
-            android.util.Log.d("MainActivity", "Re-showing welcome dialog in onResume")
-            showWelcomeDialog()
+            // Optionally re-show welcome dialog if needed
         }
     }
 
+    // Inflate the top menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.top_app_bar, menu)
-        updateThemeIcon(menu.findItem(R.id.action_toggle_theme))
         return true
     }
 
+    // Handle toolbar item clicks
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            // Toggle dark mode
             R.id.action_toggle_theme -> {
                 toggleDarkMode()
+                true
+            }
+            // Show the welcome dialog
+            R.id.action_show_welcome -> {
+                showWelcomeDialog()  // Trigger the welcome dialog
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -138,81 +130,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toggleDarkMode() {
-        // Dismiss any existing dialog before theme change
         welcomeDialog?.dismiss()
         welcomeDialog = null
 
-        // Change the theme
         preferencesManager.isDarkMode = !preferencesManager.isDarkMode
-        
-        // Apply the theme change without recreating the activity
+
+        // Apply the theme based on user preferences
         delegate.localNightMode = if (preferencesManager.isDarkMode) {
             AppCompatDelegate.MODE_NIGHT_YES
         } else {
             AppCompatDelegate.MODE_NIGHT_NO
         }
-        
-        // Update the theme icon
-        updateThemeIcon(topAppBar.menu.findItem(R.id.action_toggle_theme))
-    }
-
-    private fun updateThemeIcon(menuItem: MenuItem) {
-        menuItem.setIcon(
-            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
-                R.drawable.ic_light_mode
-            else
-                R.drawable.ic_dark_mode
-        )
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        setIntent(intent)
-        
-        // Handle show favorites intent in onNewIntent as well
-        if (intent.getBooleanExtra("SHOW_FAVORITES", false)) {
-            showFavoritesFragment()
-            bottomNavigation.selectedItemId = R.id.navigation_favorites
-        }
-
-        // Handle show search intent in onNewIntent as well
-        if (intent.action == "SHOW_SEARCH") {
-            showSearchFragment()
-            bottomNavigation.selectedItemId = R.id.navigation_search
-        }
     }
 
     private fun setupGames() {
         val games = listOf(
-            Game(
-                "ggst",
-                "Guilty Gear Strive",
-                "The latest entry in the Guilty Gear series, featuring stunning anime-style graphics and intense fighting mechanics.",
-                R.drawable.img_guilty_gear_strive,
-                R.drawable.banner_guilty_gear_strive
-            ),
-                        Game(                "kof15",                "The King of Fighters XV",                "The newest installment in SNK's flagship fighting game series, featuring 3v3 team battles.",                R.drawable.img_kof_fifteen,                R.drawable.banner_kof_fifteen            ),
-            Game(
-                "samsho",
-                "Samurai Shodown",
-                "A weapons-based fighting game focusing on precise strikes and punishing counters.",
-                R.drawable.img_samurai_shodown,
-                R.drawable.img_samurai_shodown
-            ),
-            Game(
-                "cvs2",
-                "Capcom vs SNK 2",
-                "A legendary crossover fighting game featuring characters from both Capcom and SNK universes.",
-                R.drawable.cvs2,
-                R.drawable.cvs2
-            ),
-            Game(
-                "tekken7",
-                "Tekken 7",
-                "The latest entry in the Tekken series, known for its 3D fighting system and complex mechanics.",
-                R.drawable.tekken,
-                R.drawable.tekken
-            )
+            Game("ggst", "Guilty Gear Strive", "The latest entry in the Guilty Gear series, featuring stunning anime-style graphics and intense fighting mechanics.", R.drawable.img_guilty_gear_strive, R.drawable.banner_guilty_gear_strive),
+            Game("kof15", "The King of Fighters XV", "The newest installment in SNK's flagship fighting game series, featuring 3v3 team battles.", R.drawable.img_kof_fifteen, R.drawable.banner_kof_fifteen),
+            Game("samsho", "Samurai Shodown", "A weapons-based fighting game focusing on precise strikes and punishing counters.", R.drawable.img_samurai_shodown, R.drawable.img_samurai_shodown),
+            Game("cvs2", "Capcom vs SNK 2", "A legendary crossover fighting game featuring characters from both Capcom and SNK universes.", R.drawable.cvs2, R.drawable.cvs2),
+            Game("tekken7", "Tekken 7", "The latest entry in the Tekken series, known for its 3D fighting system and complex mechanics.", R.drawable.tekken, R.drawable.tekken)
         )
 
         val adapter = GameAdapter(games)
@@ -269,4 +206,4 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val handler = Handler(android.os.Looper.getMainLooper())
-} 
+}
